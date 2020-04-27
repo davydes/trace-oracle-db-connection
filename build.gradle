@@ -1,0 +1,25 @@
+plugins {
+    id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+}
+
+group 'ru.lipt-soft'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClassName("LauncherKt")
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
