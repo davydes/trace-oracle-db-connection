@@ -18,6 +18,8 @@ application {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "com.oracle.ojdbc:ojdbc10_g:19.3.0.0"
+    implementation "com.oracle.ojdbc:orai18n:19.3.0.0"
 }
 
 compileKotlin {
