@@ -1,5 +1,4 @@
 import oracle.jdbc.OracleDriver
-import java.lang.RuntimeException
 import java.sql.DriverManager
 import java.sql.DriverManager.getConnection
 import java.sql.DriverManager.registerDriver
@@ -7,12 +6,28 @@ import java.util.logging.LogManager
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
 
-fun main() {
-    val threshold = 1000L
-    val connectionString = "jdbc:oracle:thin:iBSPB_Priv/Afpjbydthnjh_2016@10.74.95.100:1521/ibsodrb.bankspb.ru"
+fun main(args: Array<String>) {
+    if (args.isEmpty()) {
+        println("first argument must be a valid jdbc connection string\nexample: \"jdbc:oracle:thin:<username>/<password>@<host>:<port>/<db-name>\"")
+        exitProcess(1)
+    }
+
+    val threshold = run {
+        if (args.size < 2)
+            1000L
+        else
+            try {
+                args[1].toLong()
+            } catch (e: NumberFormatException) {
+                println("second argument is threshold time and must be an integral number")
+                exitProcess(1)
+            }
+    }
+
+    val connectionString = args[0]
 
     configureLogging()
-    configureJDBCDriver()
+    configureJDBCDriver(threshold)
 
     try {
         logTime("test finished", threshold) {
@@ -60,9 +75,12 @@ fun <T> logTime(name: String, threshold: Long? = null, block: () -> T): T {
 
 class TimeoutThresholdException : RuntimeException()
 
-fun configureJDBCDriver() {
+fun configureJDBCDriver(timeoutMs: Long) {
     registerDriver(OracleDriver())
-    DriverManager.setLoginTimeout(5)
+    val sessionTimeoutSec = (timeoutMs / 1000).toInt().also {
+        println("setLoginTimeout: $it seconds")
+    }
+    DriverManager.setLoginTimeout(sessionTimeoutSec)
 }
 
 fun configureLogging() {
